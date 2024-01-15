@@ -19,4 +19,4 @@ CartSchema.methods.toJSON = function() {
 }
 
 const Cart = mongoose.model('Cart', CartSchema);
-module.exports = CartSchema;
+module.exports = Cart;

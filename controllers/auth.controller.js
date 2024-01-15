@@ -15,14 +15,14 @@ authController.loginWithEmail = async(req, res) =>{
             if(isMatch) {
                 //token생성
                 const token = await user.generateToken();
-                return res.status(200).json({ status: 'success', user, token})
+                return res.status(200).json({ status: 'success', user, token })
             }
         }
     } catch(error) {
         res.status(400).json({status: 'fail', error: error.message});
     }   
 };
-
+//if문을 활용해서 Token값이 없다면 Null로 return하고 TOKen 값이 있다면 TOken을 발행할 수 있도록 구현
 authController.authenticate = async (req, res, next) =>{
     try{
         const tokenString = req.headers.authorization
@@ -32,6 +32,7 @@ authController.authenticate = async (req, res, next) =>{
             if(error) throw new Error('invalid token');
             req.userId = payload._id;
         });
+        
         next();
     } catch(error){
         res.status(400).json({ status: 'fail', error: error.message})
@@ -40,14 +41,12 @@ authController.authenticate = async (req, res, next) =>{
 
 authController.checkAdminPermission = async(req, res, next)=>{
     try{
-        //token으로 어떤 customer인지 admin인지 알 수 있음 
-        //위의 authenticate에서 token을 정의했기때문에 미들웨어로 설정해줄 수 있음
         const {userId} = req;
         const user = await User.findById(userId);
         if(user.level !== 'admin') throw new Error('no permission');
         next();
     } catch(error) {
-        res.status(400).json({ status: 'fail', error: error.message });
+        res.status(400).json({ status: 'fail0', error: error.message });
     }
 }
 
