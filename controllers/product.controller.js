@@ -119,6 +119,28 @@ productController.getProductQty = async (req, res) => {
     } catch(error) {
         res.status(400).json({ status: 'fail5', error: error.message})
     }
-}
+};
+
+productController.getCategoryProduct = async (req, res) => {
+    try {
+      const { page, category } = req.query;
+      const cond = category
+        ? { category: { $regex: category, $options: "i" }, isDeleted: false }
+        : { isDeleted: false };
+      let query = Product.find(cond);
+      let response = { status: "success" };
+      if (page) {
+        query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
+        const totalItemNum = await Product.find(cond).count();
+        const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+        response.totalPageNum = totalPageNum;
+      }
+      const productList = await query.exec();
+      response.data = productList;
+      return res.status(200).json(response);
+    } catch (error) {
+      return res.status(400).json({ status: "category fail", error: error.message });
+    }
+  };
 
 module.exports = productController;
